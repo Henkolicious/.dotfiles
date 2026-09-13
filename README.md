@@ -40,7 +40,10 @@ cannot be junctioned, so they are pointed at instead.
   they live in the title bar rather than in a strip of their own: Alt+F4 closes,
   Alt+Space then M moves, Win+arrows snap.
 - **Keys.** Added on top of upstream: Ctrl+T opens a tab and Ctrl+W closes one, the way
-  the rest of Windows does it. Ctrl+W is passed through to nvim, vim and helix instead,
+  the rest of Windows does it. Ctrl+T and the tab bar's + button both ask which shell to
+  start — PowerShell 7 or Ubuntu 24.04 under WSL2 — while Ctrl+Shift+T spawns PowerShell
+  without asking. The two entries are spelled out in `launch_menu` rather than
+  discovered, so docker-desktop's WSL distribution stays out of the list. Ctrl+W is passed through to nvim, vim and helix instead,
   since a key the terminal claims never reaches the program inside it and Ctrl+W is
   vim's window prefix. The stock Ctrl+Shift+T / Ctrl+Shift+W stay bound too.
 - **Prompt.** The existing starship config is kept rather than replaced by upstream's

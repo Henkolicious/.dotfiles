@@ -37,7 +37,16 @@ config.color_scheme = 'rose-pine-moon'
 
 -- The PowerShell profile that loads starship lives in Documents\PowerShell, which is
 -- PowerShell 7. WezTerm would otherwise start Windows PowerShell 5.1 and load neither.
-config.default_prog = { [[C:\Program Files\PowerShell\7\pwsh.exe]], "-NoLogo" }
+local PWSH = [[C:\Program Files\PowerShell\7\pwsh.exe]]
+config.default_prog = { PWSH, '-NoLogo' }
+
+-- What a new tab offers to start. Spelled out rather than taken from
+-- wezterm.default_wsl_domains(), which enumerates every registered distribution --
+-- docker-desktop's included, and that one is plumbing, not a shell to sit in.
+config.launch_menu = {
+  { label = 'PowerShell', args = { PWSH, '-NoLogo' } },
+  { label = 'Ubuntu 24.04 (WSL)', args = { 'wsl.exe', '--distribution', 'Ubuntu-24.04', '--cd', '~' } },
+}
 
 config.scrollback_lines = 10000
 config.window_padding = { left = 8, right = 8, top = 8, bottom = 4 }
@@ -69,8 +78,21 @@ local function process_name(pane)
   return (path:match('[^/\\]+$') or path):lower()
 end
 
+-- Ctrl+T picks from launch_menu instead of spawning the default shell outright; the
+-- stock Ctrl+Shift+T still spawns one without asking, for when that is what you want.
+local NEW_TAB = act.ShowLauncherArgs { flags = 'LAUNCH_MENU_ITEMS', title = 'New tab' }
+
+-- The + button on the tab bar is the same gesture, so it asks the same question.
+-- Returning false keeps WezTerm from also spawning its own default tab.
+wezterm.on('new-tab-button-click', function(window, pane, button)
+  if button == 'Left' then
+    window:perform_action(NEW_TAB, pane)
+    return false
+  end
+end)
+
 config.keys = {
-  { key = 't', mods = 'CTRL', action = act.SpawnTab 'CurrentPaneDomain' },
+  { key = 't', mods = 'CTRL', action = NEW_TAB },
   {
     key = 'w',
     mods = 'CTRL',
