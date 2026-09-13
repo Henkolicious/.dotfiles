@@ -1,0 +1,11 @@
+# herdr -- terminal workspace manager. `herdr --default-config` prints every key with
+# its default; only what differs is set here.
+
+onboarding = false
+
+[terminal]
+# New interactive panes open PowerShell 7. Left empty, herdr falls back to $SHELL and
+# then /bin/sh, which on Windows means whatever the environment happens to carry --
+# and the profile that loads starship and the aliases is PowerShell 7's.
+# A TOML literal string, so the backslashes stay backslashes.
+default_shell = 'C:\Program Files\PowerShell\7\pwsh.exe'

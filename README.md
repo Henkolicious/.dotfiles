@@ -19,11 +19,16 @@ It is idempotent, and moves anything real it finds in a target path aside to
 | `home/.config/wezterm/wezterm.lua` | `~/.config/wezterm/` | directory junction |
 | `home/.config/nvim/` | `%LOCALAPPDATA%\nvim` | directory junction |
 | `home/.config/starship.toml` | wherever `STARSHIP_CONFIG` says | user environment variable |
+| `home/.config/herdr/config.toml` | wherever `HERDR_CONFIG_PATH` says | user environment variable |
 | `home/.config/powershell/profile.ps1` | `$PROFILE` | one-line dot-sourcing stub |
 
 Real symlinks on Windows need Developer Mode or an elevated shell; directory
-junctions need neither, which is why directories get those. The two single files
-cannot be junctioned, so they are pointed at instead.
+junctions need neither, which is why directories get those. The single files
+cannot be junctioned, so they are pointed at instead. `%APPDATA%\herdr` holds
+sockets, logs and session state next to its config, so only the config is claimed.
+
+A running herdr server keeps the config it started with: `herdr server reload-config`,
+or restart it, after changing `home/.config/herdr/config.toml`.
 
 ## Deviations from upstream
 

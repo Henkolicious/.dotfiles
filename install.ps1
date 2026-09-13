@@ -31,6 +31,22 @@ function Backup-Existing {
     Write-Host "  moved aside -> $backup" -ForegroundColor DarkYellow
 }
 
+function Set-EnvPointer {
+    # For the single files that cannot be junctioned: the program is told where its
+    # config lives instead of the config being moved to where it looks.
+    param([string]$Name, [string]$Value)
+
+    Write-Host "$(Split-Path -Leaf $Value) -> $Value"
+    if ([Environment]::GetEnvironmentVariable($Name, 'User') -eq $Value) {
+        Write-Host "  $Name already set" -ForegroundColor DarkGray
+    }
+    else {
+        [Environment]::SetEnvironmentVariable($Name, $Value, 'User')
+        Write-Host "  $Name set (takes effect in new shells)" -ForegroundColor Green
+    }
+    Set-Item -Path "Env:$Name" -Value $Value
+}
+
 function Link-Directory {
     param([string]$Target, [string]$Source)
 
@@ -75,21 +91,20 @@ if (Test-Path -LiteralPath $legacyWezterm) {
 Link-Directory -Target (Join-Path $env:LOCALAPPDATA 'nvim') -Source (Join-Path $repo 'home\.config\nvim')
 
 # --- starship ----------------------------------------------------------------
-$starshipConfig = Join-Path $repo 'home\.config\starship.toml'
-Write-Host "starship.toml -> $starshipConfig"
-if ([Environment]::GetEnvironmentVariable('STARSHIP_CONFIG', 'User') -eq $starshipConfig) {
-    Write-Host '  STARSHIP_CONFIG already set' -ForegroundColor DarkGray
-}
-else {
-    [Environment]::SetEnvironmentVariable('STARSHIP_CONFIG', $starshipConfig, 'User')
-    Write-Host '  STARSHIP_CONFIG set (takes effect in new shells)' -ForegroundColor Green
-}
-$env:STARSHIP_CONFIG = $starshipConfig
+Set-EnvPointer -Name 'STARSHIP_CONFIG' -Value (Join-Path $repo 'home\.config\starship.toml')
 
 # The copy starship would otherwise have found by default, left in place, would be a
 # second source of truth that nothing reads.
 $defaultStarship = Join-Path $HOME '.config\starship.toml'
 if (Test-Path -LiteralPath $defaultStarship) { Backup-Existing $defaultStarship }
+
+# --- herdr -------------------------------------------------------------------
+Set-EnvPointer -Name 'HERDR_CONFIG_PATH' -Value (Join-Path $repo 'home\.config\herdr\config.toml')
+
+# Same reasoning as starship. herdr keeps sockets, logs and session state in this
+# directory alongside the config, which is why the directory itself is not junctioned.
+$defaultHerdr = Join-Path $env:APPDATA 'herdr\config.toml'
+if (Test-Path -LiteralPath $defaultHerdr) { Backup-Existing $defaultHerdr }
 
 # --- PowerShell profile ------------------------------------------------------
 $profilePath = $PROFILE.CurrentUserCurrentHost
