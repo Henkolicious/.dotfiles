@@ -1,0 +1,38 @@
+# bash aliases for WSL -- the same set as .config/zsh/zshrc and .config/powershell/profile.ps1.
+# ~/.bash_aliases is a symlink to this file; see ~/.dotfiles/install.sh.
+#
+# This exists because the distribution's login shell is still bash: zsh is what install.sh
+# sets up, and until its apt and chsh steps have run the zshrc is inert. Stock .bashrc
+# already sources ~/.bash_aliases near its end -- after its own ll/la/l -- so the aliases
+# land without touching a file apt owns, and whichever shell starts has the same set.
+#
+# Only the alias section of the zshrc carries over. The prompt, history, completion and
+# line-editing sections are zsh answers to PSReadLine features and have no business here;
+# bash picking up starship is a separate decision, not an alias.
+
+alias ..='cd ..'
+alias add='git add .'
+alias push='git push'
+alias pull='git pull'
+alias m='git switch main'
+
+# cc stays on plain `claude` -- the permission prompts are the only thing between an
+# agent and this machine -- and the unattended variant keeps its own name, so skipping
+# them stays a deliberate keystroke.
+alias cc='claude'
+alias ccd='claude --dangerously-skip-permissions'
+alias co='codex --full-auto'
+
+# eza stands in for Terminal-Icons, drawing Nerd Font glyphs out of the font WezTerm sets.
+# It arrives with install.sh's apt step, so the fallback is the live branch until that has
+# run: these names are the ones stock .bashrc defines, and overriding them here keeps
+# ll/la/l pointing at the same thing in both shells.
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --icons --group-directories-first'
+    alias ll='eza --icons --group-directories-first --long --all'
+    alias la='eza --icons --group-directories-first --all'
+    alias l='eza --icons --group-directories-first'
+fi
+
+# No `grep --color=auto` and no plain-ls fallback: stock .bashrc sets both already, behind
+# its own dircolors check. The zshrc needs them only because zsh has no such default.

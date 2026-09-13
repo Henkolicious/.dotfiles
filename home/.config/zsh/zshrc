@@ -1,0 +1,121 @@
+# zsh profile for WSL -- the counterpart of .config/powershell/profile.ps1.
+# ~/.zshrc is a symlink to this file; see ~/.dotfiles/install.sh.
+#
+# This tracks profile.ps1 section for section, so that a WSL pane and a PowerShell pane
+# in the same WezTerm window behave the same way. Where zsh has no equivalent of a
+# PSReadLine feature the gap is commented rather than quietly dropped.
+
+# --- PATH --------------------------------------------------------------------
+# starship and nvim are installed per-user under ~/.local rather than by apt: the
+# archive's neovim is 0.9.5 and the shared nvim config calls vim.uv, which arrived in
+# 0.10. ~/.npm-global/bin is what the stock .bashrc put on PATH.
+typeset -U path            # keep it deduplicated when a login shell re-reads this
+path=("$HOME/.local/bin" "$HOME/.npm-global/bin" $path)
+export PATH
+
+# --- Prompt ------------------------------------------------------------------
+# The very same starship.toml PowerShell renders: ~/.config/starship.toml is a symlink
+# onto the repo copy, which is the file STARSHIP_CONFIG points at on the Windows side.
+# Its glyphs come from the font WezTerm sets, so they resolve identically in both panes.
+eval "$(starship init zsh)"
+
+export EDITOR=nvim
+
+# --- Aliases -----------------------------------------------------------------
+# The same set as profile.ps1, back in their original zsh form: PowerShell needed
+# functions because its aliases take no arguments, zsh's do.
+alias ..='cd ..'
+alias add='git add .'
+alias push='git push'
+alias pull='git pull'
+alias m='git switch main'
+
+# cc stays on plain `claude` -- the permission prompts are the only thing between an
+# agent and this machine -- and the unattended variant keeps its own name, so skipping
+# them stays a deliberate keystroke.
+alias cc='claude'
+alias ccd='claude --dangerously-skip-permissions'
+alias co='codex --full-auto'
+
+# Terminal-Icons has no zsh counterpart. eza draws Nerd Font glyphs beside each entry
+# out of the same font, which is what that module is there for. The ll/la/l names are
+# the ones the stock .bashrc defined, kept so the muscle memory survives the switch.
+if (( $+commands[eza] )); then
+  alias ls='eza --icons --group-directories-first'
+  alias ll='eza --icons --group-directories-first --long --all'
+  alias la='eza --icons --group-directories-first --all'
+  alias l='eza --icons --group-directories-first'
+else
+  alias ls='ls --color=auto'
+  alias ll='ls -alF --color=auto'
+  alias la='ls -A --color=auto'
+  alias l='ls -CF --color=auto'
+fi
+alias grep='grep --color=auto'
+
+# --- History -----------------------------------------------------------------
+# zsh saves nothing at all unless told where to put it. PSReadLine keeps a persistent
+# file, drops duplicates, and appends as it goes rather than at exit; these are the
+# nearest options. INC_APPEND_HISTORY rather than SHARE_HISTORY, because PSReadLine
+# does not pull other sessions' commands into a running one either.
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+setopt INC_APPEND_HISTORY HIST_IGNORE_ALL_DUPS HIST_IGNORE_SPACE HIST_REDUCE_BLANKS
+
+# --- Colours -----------------------------------------------------------------
+# The stock .bashrc ran this and zsh has no equivalent default, so without it LS_COLORS
+# is unset here: the fallback `ls` aliases and the completion list below would both come
+# out monochrome.
+if (( $+commands[dircolors] )); then
+  eval "$(dircolors -b)"
+fi
+
+# --- Completion --------------------------------------------------------------
+autoload -Uz compinit && compinit
+# PowerShell completes without caring about case; zsh does only if asked to match loosely.
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# --- Line editing ------------------------------------------------------------
+# PSReadLine's EditMode Windows is emacs-like rather than vi-like.
+bindkey -e
+
+# Up/Down recall only the history entries starting with what is already typed, the way
+# HistorySearchBackward/Forward do. The -end variants leave the cursor at the end of the
+# recalled line, which is where PSReadLine leaves it; the plain widgets would not.
+autoload -Uz history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+bindkey '^[[A' history-beginning-search-backward-end   # Up
+bindkey '^[[B' history-beginning-search-forward-end    # Down
+bindkey '^[OA' history-beginning-search-backward-end   # ditto, application cursor mode
+bindkey '^[OB' history-beginning-search-forward-end
+
+# Windows edit mode cycles through completions on Tab (TabCompleteNext) instead of
+# printing them as a list; Shift+Tab walks back.
+bindkey '^I' menu-complete
+bindkey '^[[Z' reverse-menu-complete
+
+# --- Inline prediction -------------------------------------------------------
+# PSReadLine's PredictionSource History, greying the rest of the most recent matching
+# command in ahead of the cursor. Ctrl+F accepts it -- the same chord profile.ps1 binds
+# to AcceptSuggestion, and the one upstream binds to zsh's autosuggest-accept.
+#
+# PredictionViewStyle ListView does not carry over: zsh has nothing that drops a
+# navigable list of past commands beneath the prompt. The inline half is the half
+# that exists here.
+ZSH_AUTOSUGGEST_STRATEGY=(history)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#7b8494'   # starship.toml's `muted`, so the two agree
+if [[ -r /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+  bindkey '^F' autosuggest-accept
+fi
+
+# --- Syntax highlighting -----------------------------------------------------
+# PSReadLine colours the command line as it is typed; this is that. It has to be sourced
+# last, because it wraps every widget bound before it -- including the ones above.
+if [[ -r /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
