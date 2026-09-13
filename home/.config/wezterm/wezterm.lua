@@ -5,6 +5,7 @@
 -- by their Windows equivalents. Deviations are commented where they occur.
 
 local wezterm = require 'wezterm'
+local act = wezterm.action
 local config = wezterm.config_builder()
 
 local FONT = 'CaskaydiaCove Nerd Font Mono'
@@ -51,6 +52,39 @@ config.win32_system_backdrop = 'Acrylic'
 -- rather than in a strip of their own: close with Alt+F4, move with Alt+Space then M.
 config.window_decorations = 'RESIZE'
 config.hide_tab_bar_if_only_one_tab = true
+
+-- Ctrl+T / Ctrl+W for tabs, the shape the rest of Windows uses. WezTerm's own
+-- Ctrl+Shift+T / Ctrl+Shift+W stay bound as well.
+--
+-- Ctrl+W is also vim's window prefix, and a key the terminal claims never reaches the
+-- program inside it -- binding it outright would put nvim's splits out of reach. So the
+-- editors that want the key get it, and everything else closes the tab.
+local CTRL_W_BELONGS_TO = { ['nvim.exe'] = true, ['vim.exe'] = true, ['hx.exe'] = true }
+
+local function process_name(pane)
+  local path = pane:get_foreground_process_name()
+  if not path then
+    return ''
+  end
+  return (path:match('[^/\\]+$') or path):lower()
+end
+
+config.keys = {
+  { key = 't', mods = 'CTRL', action = act.SpawnTab 'CurrentPaneDomain' },
+  {
+    key = 'w',
+    mods = 'CTRL',
+    action = wezterm.action_callback(function(window, pane)
+      if CTRL_W_BELONGS_TO[process_name(pane)] then
+        window:perform_action(act.SendKey { key = 'w', mods = 'CTRL' }, pane)
+      else
+        -- confirm = true only prompts when something other than the shell is running,
+        -- which is what keeps a mistyped Ctrl+W from killing a build.
+        window:perform_action(act.CloseCurrentTab { confirm = true }, pane)
+      end
+    end),
+  },
+}
 
 -- Dim unfocused windows so the focused one is obvious at a glance.
 local UNFOCUSED_FOREGROUND_TEXT_HSB = { hue = 1.0, saturation = 0.25, brightness = 0.45 }

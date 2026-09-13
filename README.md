@@ -39,6 +39,10 @@ cannot be junctioned, so they are pointed at instead.
   hidden on a single tab. On Windows that leaves no close/minimise buttons at all, since
   they live in the title bar rather than in a strip of their own: Alt+F4 closes,
   Alt+Space then M moves, Win+arrows snap.
+- **Keys.** Added on top of upstream: Ctrl+T opens a tab and Ctrl+W closes one, the way
+  the rest of Windows does it. Ctrl+W is passed through to nvim, vim and helix instead,
+  since a key the terminal claims never reaches the program inside it and Ctrl+W is
+  vim's window prefix. The stock Ctrl+Shift+T / Ctrl+Shift+W stay bound too.
 - **Prompt.** The existing starship config is kept rather than replaced by upstream's
   minimal one; its glyphs are chosen against the Nerd Font actually installed here.
 - **Aliases.** zsh aliases become PowerShell functions, since PowerShell aliases take no
