@@ -99,12 +99,18 @@ $defaultStarship = Join-Path $HOME '.config\starship.toml'
 if (Test-Path -LiteralPath $defaultStarship) { Backup-Existing $defaultStarship }
 
 # --- herdr -------------------------------------------------------------------
+# The directory itself is not junctioned: herdr keeps sockets, logs and session state
+# in it alongside the config.
 Set-EnvPointer -Name 'HERDR_CONFIG_PATH' -Value (Join-Path $repo 'home\.config\herdr\config.toml')
 
-# Same reasoning as starship. herdr keeps sockets, logs and session state in this
-# directory alongside the config, which is why the directory itself is not junctioned.
-$defaultHerdr = Join-Path $env:APPDATA 'herdr\config.toml'
-if (Test-Path -LiteralPath $defaultHerdr) { Backup-Existing $defaultHerdr }
+# %APPDATA%\herdr\config.toml is deliberately left where it is, unlike starship's
+# default. herdr writes to its config file -- onboarding state lives there -- so a
+# displaced one just reappears, and a hard link to the repo copy gets replaced on the
+# next write. It is read only by a herdr started without the variable above.
+if (Get-Process herdr -ErrorAction SilentlyContinue) {
+    Write-Host '  a herdr server is running; it keeps the config path it started with' -ForegroundColor DarkYellow
+    Write-Host '  restart it to pick this up, or copy the config over and run `herdr server reload-config`' -ForegroundColor DarkYellow
+}
 
 # --- PowerShell profile ------------------------------------------------------
 $profilePath = $PROFILE.CurrentUserCurrentHost

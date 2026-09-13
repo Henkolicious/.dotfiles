@@ -27,8 +27,14 @@ junctions need neither, which is why directories get those. The single files
 cannot be junctioned, so they are pointed at instead. `%APPDATA%\herdr` holds
 sockets, logs and session state next to its config, so only the config is claimed.
 
-A running herdr server keeps the config it started with: `herdr server reload-config`,
-or restart it, after changing `home/.config/herdr/config.toml`.
+herdr resolves its config path once, at server start, and writes to that file itself
+(onboarding state lives there). So a server already running when `HERDR_CONFIG_PATH` was
+set keeps reading `%APPDATA%\herdr\config.toml`, and displacing that file only makes
+herdr write a fresh one. Restart the server to pick the variable up; to change a running
+one, copy the config over the path it started with and run `herdr server reload-config`.
+
+Existing panes keep the shell they were spawned with -- `[terminal] default_shell`
+applies to new panes.
 
 ## Deviations from upstream
 
