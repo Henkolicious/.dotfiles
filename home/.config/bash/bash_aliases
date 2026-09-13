@@ -16,6 +16,11 @@ alias push='git push'
 alias pull='git pull'
 alias m='git switch main'
 
+# `cls` is a PowerShell built-in (an alias for Clear-Host), so it is one of the names the
+# muscle memory arrives with. `clear` is what it is called here; this keeps both working
+# in a WSL pane rather than leaving one of them a command-not-found.
+alias cls='clear'
+
 # cc stays on plain `claude` -- the permission prompts are the only thing between an
 # agent and this machine -- and the unattended variant keeps its own name, so skipping
 # them stays a deliberate keystroke.
