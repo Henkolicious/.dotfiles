@@ -1,0 +1,2 @@
+# install.ps1 moves whatever it displaces here alongside the original
+*.bak-*

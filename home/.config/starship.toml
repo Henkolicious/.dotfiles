@@ -1,0 +1,95 @@
+# Starship configuration - https://starship.rs/config/
+#
+# Every glyph below was verified present in CaskaydiaCove Nerd Font Mono v3.5.1, the font
+# this machine has installed and the one both WezTerm and Windows Terminal are set to.
+# The git_status symbols are deliberately not starship's defaults: U+2718 (deleted) and
+# U+21D5 (diverged) are absent even from v3, so the whole set is taken from the Nerd icon
+# range instead, which keeps it visually consistent rather than mixing two sources.
+#
+# The prompt is one continuous bar on a single background. Segments are told apart by
+# foreground colour rather than by chained powerline separators, because a chained bar
+# leaves a stray separator and an empty coloured sliver whenever a conditional module
+# (dotnet, nodejs, git) does not render.
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+command_timeout = 1500
+palette = 'henko'
+
+format = """
+[](fg:bar)\
+$directory\
+$git_branch\
+$git_status\
+$dotnet\
+$nodejs\
+[ ](bg:bar)\
+[](fg:bar)\
+$line_break\
+$character"""
+
+right_format = """$cmd_duration$time"""
+
+[palettes.henko]
+bar = '#2b3140'
+dir = '#8fb8e0'
+git = '#9ed49a'
+lang = '#c9a0e8'
+muted = '#7b8494'
+ok = '#7ec699'
+err = '#e06c75'
+
+[directory]
+style = 'bg:bar fg:dir'
+format = '[  $path]($style)'
+truncation_length = 3
+truncate_to_repo = true
+truncation_symbol = ''
+
+[git_branch]
+symbol = ''
+style = 'bg:bar fg:git'
+format = '[ $symbol $branch]($style)'
+
+[git_status]
+style = 'bg:bar fg:git'
+format = '[$all_status$ahead_behind]($style)'
+conflicted = ' '
+ahead = ' ${count}'
+behind = ' ${count}'
+diverged = '  ${ahead_count} ${behind_count}'
+untracked = ' ${count}'
+stashed = ' ${count}'
+modified = ' ${count}'
+staged = ' ${count}'
+renamed = ' ${count}'
+deleted = ' ${count}'
+
+[dotnet]
+symbol = ''
+style = 'bg:bar fg:lang'
+format = '[ $symbol $version]($style)'
+heuristic = true
+
+[nodejs]
+symbol = ''
+style = 'bg:bar fg:lang'
+format = '[ $symbol $version]($style)'
+detect_files = ['package.json', '.node-version', 'vite.config.ts', 'vite.config.js']
+
+[character]
+success_symbol = '[](bold ok)'
+error_symbol = '[](bold err)'
+vimcmd_symbol = '[](bold ok)'
+
+[cmd_duration]
+min_time = 2000
+style = 'muted'
+format = '[ $duration]($style)'
+
+[time]
+disabled = false
+time_format = '%H:%M'
+style = 'muted'
+format = '[  $time]($style)'
