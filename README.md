@@ -35,10 +35,10 @@ cannot be junctioned, so they are pointed at instead.
 - **Translucency.** `macos_window_background_blur` does nothing off macOS; the Windows 11
   equivalent is `win32_system_backdrop = 'Acrylic'`, which only shows through while
   `window_background_opacity` is below 1.
-- **Window chrome.** Upstream hides the tab bar on a single tab and drops the title bar
-  with `window_decorations = "RESIZE"`. On Windows the close/minimise buttons live in the
-  title bar rather than in a strip of their own, so the tab bar has to carry them
-  (`INTEGRATED_BUTTONS|RESIZE`) and cannot be hidden.
+- **Window chrome.** Same as upstream — `window_decorations = "RESIZE"` and the tab bar
+  hidden on a single tab. On Windows that leaves no close/minimise buttons at all, since
+  they live in the title bar rather than in a strip of their own: Alt+F4 closes,
+  Alt+Space then M moves, Win+arrows snap.
 - **Prompt.** The existing starship config is kept rather than replaced by upstream's
   minimal one; its glyphs are chosen against the Nerd Font actually installed here.
 - **Aliases.** zsh aliases become PowerShell functions, since PowerShell aliases take no

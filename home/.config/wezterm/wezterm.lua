@@ -46,12 +46,11 @@ config.window_padding = { left = 8, right = 8, top = 8, bottom = 4 }
 config.window_background_opacity = 0.9
 config.win32_system_backdrop = 'Acrylic'
 
--- RESIZE alone drops the title bar, and on Windows the close/minimise buttons live in
--- it rather than in a separate strip -- so the tab bar has to carry them, which means
--- it cannot be hidden on a single tab the way it is on macOS.
-config.window_decorations = 'INTEGRATED_BUTTONS|RESIZE'
-config.hide_tab_bar_if_only_one_tab = false
-config.use_fancy_tab_bar = true
+-- No title bar, no window buttons, just a resize edge -- same as upstream. On Windows
+-- that also takes the close/minimise buttons with it, since they live in the title bar
+-- rather than in a strip of their own: close with Alt+F4, move with Alt+Space then M.
+config.window_decorations = 'RESIZE'
+config.hide_tab_bar_if_only_one_tab = true
 
 -- Dim unfocused windows so the focused one is obvious at a glance.
 local UNFOCUSED_FOREGROUND_TEXT_HSB = { hue = 1.0, saturation = 0.25, brightness = 0.45 }
