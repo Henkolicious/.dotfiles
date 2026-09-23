@@ -70,8 +70,29 @@ Deliberately outside this repo, and each one a manual step on a new machine:
 - **The Aspire CLI** — `aspire run` needs it, and it has its own installer rather than
   being a NuGet global tool. bootstrap.ps1 warns when it is missing.
 - **Agent configuration** — `~/.claude` (settings, hooks, skills), `~/.codex`,
-  `~/.agents`. A real part of the environment; it simply lives elsewhere.
+  `~/.agents`. A real part of the environment; it simply lives elsewhere. See
+  "Suggestions" below for the one piece of it the repo does carry.
 - **`codex` inside WSL** — see the last bullet under "The WSL side".
+
+## Suggestions
+
+`suggested/` is the exception to everything under "What lives where": nothing in it is
+linked, no installer reads it, and taking it is optional. It carries configuration for
+programs whose own directories this repo will not claim.
+
+So far that is one file, `suggested/claude/statusline-command.ps1` — a Claude Code
+statusline reading
+
+```
+Opus 5 | ctx 34% | session 12% (3h41m) | week 58% (4d2h)
+```
+
+context-window fill, then the 5-hour and 7-day rate-limit windows with the time each has
+left to run, coloured yellow past 75% and red past 90%. `suggested/claude/README.md` has
+the install, which is a copy into `~/.claude` and a `statusLine` block in `settings.json`.
+
+A copy, not a junction: `~/.claude` holds account and session state alongside its
+settings, and claiming that directory to share one script would be the wrong trade.
 
 ## What lives where
 

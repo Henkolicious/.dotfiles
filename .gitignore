@@ -1,2 +1,5 @@
 # install.ps1 moves whatever it displaces here alongside the original
 *.bak-*
+
+# herdr writes onboarding/notification state into its config dir at runtime
+home/.config/herdr/release-notes.json

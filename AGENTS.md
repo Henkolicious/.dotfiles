@@ -63,7 +63,11 @@ about each. Ask rather than assume.
 - **The Aspire CLI.** Not a NuGet global tool; it has its own installer. bootstrap.ps1
   reports it as missing but will not install it.
 - **Agent configuration** — `~/.claude`, `~/.codex`, `~/.agents`. Part of the working
-  environment, kept out of this repo on purpose.
+  environment, kept out of this repo on purpose. One piece of it is offered rather than
+  installed: `suggested/claude/` holds a Claude Code statusline that reports context-window
+  fill and the 5-hour and 7-day rate-limit windows. Offer it if the machine will run Claude
+  Code; installing it is a copy plus three lines of `settings.json`, both in that
+  directory's README. Nothing in `suggested/` is linked, and no installer touches it.
 - **`codex` in WSL.** The Windows PATH leaks into the distribution, so `codex` resolves
   to the npm shim under `/mnt/c` and fails on a missing Linux binary.
   `npm install -g @openai/codex` inside WSL fixes it. `claude` is installed natively and
